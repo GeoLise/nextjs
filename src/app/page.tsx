@@ -64,7 +64,7 @@ export default async function Home() {
             Documentation
           </a>
         </div>
-        <div className="text-green-600">
+        <div className="text-red-400">
           {!!products &&
             products.map((product) => <p key={product.id}>{product.name}</p>)}
         </div>

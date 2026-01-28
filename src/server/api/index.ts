@@ -10,6 +10,8 @@ export const app = new Elysia({
 .use(productsRouter)
 .use(categoriesRouter)
 
+
 export const api = treaty(app).api
+
 
 export type App = typeof app
