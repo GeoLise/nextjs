@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1768816551848,
-      "tag": "0000_tricky_excalibur",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1768817725716,
-      "tag": "0001_cultured_microchip",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1768915683689,
-      "tag": "0002_hard_bullseye",
+      "when": 1770027031206,
+      "tag": "0000_absurd_obadiah_stane",
       "breakpoints": true
     }
   ]

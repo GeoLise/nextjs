@@ -20,11 +20,11 @@ export const productsRouter = new Elysia({
     })
 })
 .post("/", async ({ body }) => {
-    await db.insert(products).values({
+    return await db.insert(products).values({
         name: body.name,
         price: body.price,
         categoryId: body.categoryId
-    })
+    }).returning()
 }, {
     body: z.object({
         name: z.string(),

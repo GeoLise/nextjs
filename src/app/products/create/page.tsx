@@ -1,22 +1,34 @@
-/** biome-ignore-all lint/a11y/noLabelWithoutControl: <explanation> */
+/** biome-ignore-all lint/correctness/noUnusedFunctionParameters: <explanation> */
+/** biome-ignore-all lint/a11y/useButtonType: <explanation> */
 "use client";
 
 import { api } from "@/app/lib/client/api";
+import { queryClient } from "@/app/lib/client/query-client";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { z } from "zod/v4";
-
-const productSchema = z.object({
-  name: z.string({ message: "Name is required" }).min(3).max(50),
-  price: z.number({ message: "Price is required" }).min(1).max(100000),
-  categoryId: z.string({ message: "Category is required" }),
-});
+import z from "zod/v4";
 
 export default function CreateProductPage() {
+  const productSchema = z.object({
+    name: z
+      .string({ message: "Name is required" })
+      .min(3, "Name must be at least 3 characters")
+      .max(30),
+    price: z.number({ message: "Price is required" }).min(1).max(100000000),
+    categoryId: z.string(),
+  });
+
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       return (await api.categories.get()).data;
+    },
+  });
+
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      return (await api.products.get()).data;
     },
   });
 
@@ -31,36 +43,53 @@ export default function CreateProductPage() {
     },
     onSuccess: () => {
       alert("Product created successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["products"],
+      });
     },
     onError: (error) => {
-      alert(error);
+      alert(error.message);
     },
   });
 
   const form = useForm({
     defaultValues: {} as z.infer<typeof productSchema>,
-    onSubmit: async ({ value }) => {
-      createProductMutation.mutate(value);
+    onSubmit: async (values) => {
+      await createProductMutation.mutateAsync(values.value);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationKey: ["deleteProduct"],
+    mutationFn: async (productId: string) => {
+      await api.products({ id: productId }).delete();
+    },
+    onSuccess: () => {
+      alert("Product deleted successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["products"],
+      });
     },
   });
 
   return (
-    <div className="flex flex-col gap-20">
-      <p>Create product</p>
+    <div className=" container mx-auto bg-red-300 p-4 flex flex-col gap-4">
       <form
-        className="flex flex-col gap-6 p-2 bg-green-300"
         onSubmit={(e) => {
-          e.preventDefault();
           e.stopPropagation();
+          e.preventDefault();
+          form.handleSubmit();
         }}
+        className="flex flex-col gap-4 border border-yellow-800 rounded-xl p-4"
       >
         <form.Field name="name">
           {(field) => (
             <div className="flex flex-col gap-1">
-              <label>Name</label>
+              <p>Name</p>
               <input
-                className="bg-red-200 text-black p-2 h-10 w-40"
-                placeholder="Ttpe name"
+                className="bg-green-400 placeholder:text-blue-400"
+                placeholder="Type name"
+                value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
               />
             </div>
@@ -69,10 +98,10 @@ export default function CreateProductPage() {
         <form.Field name="price">
           {(field) => (
             <div className="flex flex-col gap-1">
-              <label>Price</label>
+              <p>Price</p>
               <input
-                className="bg-red-200 text-black p-2 h-10 w-40"
-                placeholder="Ttpe price"
+                className="bg-green-400 placeholder:text-blue-400"
+                placeholder="Type price"
                 onChange={(e) => field.handleChange(Number(e.target.value))}
               />
             </div>
@@ -80,18 +109,16 @@ export default function CreateProductPage() {
         </form.Field>
         <form.Field name="categoryId">
           {(field) => (
-            <div className="flex flex-col gap-1">
-              {" "}
-              <label>Категория</label>{" "}
+            <div>
+              <p>Category</p>
               <select
                 value={field.state.value ?? ""}
                 onChange={(e) => field.handleChange(e.target.value)}
-                className="p-2 w-40 bg-white placeholder:text-zinc-400 text-black"
               >
-                <option value="">Выберите категорию</option>
-                {categories?.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
+                <option value="">Select category</option>
+                {categories?.map((cat) => (
+                  <option value={cat.id} key={cat.id}>
+                    {cat.name}
                   </option>
                 ))}
               </select>
@@ -102,14 +129,32 @@ export default function CreateProductPage() {
           {(state) => (
             <button
               type="submit"
-              onClick={() => form.handleSubmit()}
-              className="text-blue-400 bg-red-400 rounded-2xl w-fit p-2"
+              className="bg-amber-500 text-white p-2 rounded-xl"
             >
-              Create product
+              Create
             </button>
           )}
         </form.Subscribe>
       </form>
+      <div className="flex flex-row gap-4">
+        {isLoading && <p>Loading...</p>}
+        {!isLoading &&
+          products?.map((prod) => (
+            <div
+              className="flez flex-col aspect-square items-center justify-center rounded-md bg-blue-300 p-4"
+              key={prod.id}
+            >
+              <button
+                onClick={() => deleteMutation.mutate(prod.id)}
+                className="bg-red-500 text-white p-2"
+              >
+                Delete
+              </button>
+              <p>{prod.name}</p>
+              <p>{prod.price}</p>
+            </div>
+          ))}
+      </div>
     </div>
   );
 }
