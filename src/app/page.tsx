@@ -1,10 +1,12 @@
 import { api } from "@/server/api";
+import { getAuthServerSession } from "@/server/auth";
 import Image from "next/image";
 
 export default async function Home() {
   const products = (await api.products.get()).data;
 
-  console.log(products);
+  const session = await getAuthServerSession();
+  console.log(session);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
