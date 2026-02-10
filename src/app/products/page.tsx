@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../lib/client/api";
 import { queryClient } from "../lib/client/query-client";
+import { useSession } from "next-auth/react";
 
 export default function Products() {
   const { data: products, isLoading: isProductsLoading } = useQuery({

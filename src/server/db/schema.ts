@@ -15,3 +15,11 @@ export const users = pg.pgTable("users", {
     hashedPassword: pg.varchar("hashed_password", {length: 255}).notNull(),
     role: roleEnum("role").notNull().default("USER")
 })
+
+
+export const files = pg.pgTable("files", {
+    id: pg.varchar("id", {length: 255}).notNull().primaryKey().$defaultFn(() => Bun.randomUUIDv7()),
+    createdAt: pg.timestamp("created_at").notNull().defaultNow(),
+    fileName: pg.varchar("file_name", {length: 255}).notNull(),
+    contentType: pg.varchar("content_type", {length: 255}).notNull(),
+})

@@ -3,7 +3,7 @@
 import { api } from "@/app/lib/client/api";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import z from "zod/v4";
 
 export default function SignUpPage() {
@@ -23,12 +23,12 @@ export default function SignUpPage() {
 
       return data;
     },
-    onSuccess: async (data) => {
-      await signIn("credentials", {
-        ...data,
-        redirect: false,
-      });
-    },
+    // onSuccess: async (data) => {
+    //   await signIn("credentials", {
+    //     ...data,
+    //     redirect: false,
+    //   });
+    // },
     onError: (error) => {
       alert(error.message);
     },

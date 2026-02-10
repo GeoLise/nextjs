@@ -3,16 +3,20 @@ import { db } from "../db";
 import { and, eq } from "drizzle-orm";
 import { products } from "../db/products";
 import z from "zod/v4";
+import { userService } from "./user";
 
 
 
 export const productsRouter = new Elysia({
     prefix: "/products"
 })
+.use(userService)
 .get("/", async () => {
     return await db.query.products.findMany({
         where: eq(products.isDeleted, false)
     })
+}, {
+    isSignedIn: true
 })
 .get("/:id", async ({ params }) => {
     return await db.query.products.findFirst({
@@ -30,7 +34,8 @@ export const productsRouter = new Elysia({
         name: z.string(),
         price: z.number(),
         categoryId: z.string()
-    })
+    }),
+    hasRole: "ADMIN"
 })
 .put("/:id", async ({ params, body}) => {
     await db.update(products).set({
