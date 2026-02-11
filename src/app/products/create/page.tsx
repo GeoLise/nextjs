@@ -6,6 +6,7 @@ import { api } from "@/app/lib/client/api";
 import { queryClient } from "@/app/lib/client/query-client";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 import z from "zod/v4";
 
 export default function CreateProductPage() {
@@ -16,6 +17,7 @@ export default function CreateProductPage() {
       .max(30),
     price: z.number({ message: "Price is required" }).min(1).max(100000000),
     categoryId: z.string(),
+    image: z.string().optional(),
   });
 
   const { data: categories } = useQuery({
@@ -73,7 +75,7 @@ export default function CreateProductPage() {
   });
 
   return (
-    <div className=" container mx-auto bg-red-300 p-4 flex flex-col gap-4">
+    <div className=" container mx-auto p-4 flex flex-col gap-4">
       <form
         onSubmit={(e) => {
           e.stopPropagation();
@@ -125,6 +127,13 @@ export default function CreateProductPage() {
             </div>
           )}
         </form.Field>
+        <form.Field name="image">
+          {(filed) => (
+            <div className="bg-purple-300 w-96 p-4 rounded-xl border border-purple-600">
+              <ImageInput onSuccess={filed.handleChange} />
+            </div>
+          )}
+        </form.Field>
         <form.Subscribe>
           {(state) => (
             <button
@@ -141,20 +150,65 @@ export default function CreateProductPage() {
         {!isLoading &&
           products?.map((prod) => (
             <div
-              className="flez flex-col aspect-square items-center justify-center rounded-md bg-blue-300 p-4"
+              className="flez flex-col aspect-square items-center justify-center bg-zinc-400/20 border border-zinc-600 rounded-md p-4"
               key={prod.id}
             >
+              <div className="relative w-20 h-20 bg-red-400">
+                {prod.image && (
+                  <img
+                    className="object-cover w-full h-full"
+                    alt="product foto"
+                    width={1920}
+                    height={1080}
+                    src={`${window.location.origin}/api/file/${prod.image}`}
+                  />
+                )}
+              </div>
+              <p>{prod.name}</p>
+              <p>{prod.price}</p>
               <button
                 onClick={() => deleteMutation.mutate(prod.id)}
                 className="bg-red-500 text-white p-2"
               >
                 Delete
               </button>
-              <p>{prod.name}</p>
-              <p>{prod.price}</p>
             </div>
           ))}
       </div>
     </div>
+  );
+}
+
+function ImageInput({ onSuccess }: { onSuccess: (id: string) => void }) {
+  const saveFileMutation = useMutation({
+    mutationKey: ["saveFile"],
+    mutationFn: async (image: File) => {
+      const res = await api.file.post({
+        file: image,
+      });
+
+      if (res.error) {
+        throw new Error(res.error.value.message);
+      }
+
+      console.log(res.data);
+
+      return res.data;
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+    onSuccess: (data) => {
+      alert("File saved successfully");
+      onSuccess(data);
+    },
+  });
+
+  return (
+    <input
+      type="file"
+      className="cursor-pointer"
+      onChange={(e) => saveFileMutation.mutate(e.target.files![0])}
+    />
   );
 }

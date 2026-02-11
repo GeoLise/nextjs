@@ -15,8 +15,6 @@ export const productsRouter = new Elysia({
     return await db.query.products.findMany({
         where: eq(products.isDeleted, false)
     })
-}, {
-    isSignedIn: true
 })
 .get("/:id", async ({ params }) => {
     return await db.query.products.findFirst({
@@ -27,15 +25,17 @@ export const productsRouter = new Elysia({
     return await db.insert(products).values({
         name: body.name,
         price: body.price,
-        categoryId: body.categoryId
+        categoryId: body.categoryId,
+        image: body.image
     }).returning()
 }, {
     body: z.object({
         name: z.string(),
         price: z.number(),
-        categoryId: z.string()
+        categoryId: z.string(),
+        image: z.string().optional(),
     }),
-    hasRole: "ADMIN"
+    // hasRole: "ADMIN"
 })
 .put("/:id", async ({ params, body}) => {
     await db.update(products).set({

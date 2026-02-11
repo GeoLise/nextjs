@@ -6,7 +6,6 @@ export default async function Home() {
   const products = (await api.products.get()).data;
 
   const session = await getAuthServerSession();
-  console.log(session);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">

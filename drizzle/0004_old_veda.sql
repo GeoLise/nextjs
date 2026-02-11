@@ -1,0 +1,2 @@
+ALTER TABLE "products" ADD COLUMN "image" varchar(255);--> statement-breakpoint
+ALTER TABLE "products" ADD CONSTRAINT "products_image_files_id_fk" FOREIGN KEY ("image") REFERENCES "public"."files"("id") ON DELETE no action ON UPDATE no action;
