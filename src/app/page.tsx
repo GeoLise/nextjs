@@ -1,15 +1,20 @@
-import { api } from "@/server/api";
-import { getAuthServerSession } from "@/server/auth";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { MessageSquareCheck } from "lucide-react";
 import Image from "next/image";
 
 export default async function Home() {
-  const products = (await api.products.get()).data;
-
-  const session = await getAuthServerSession();
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-800 font-sans dark:bg-black">
+      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-zinc-400 dark:bg-black sm:items-start">
         <Image
           className="dark:invert"
           src="/next.svg"
@@ -65,10 +70,33 @@ export default async function Home() {
             Documentation
           </a>
         </div>
-        <div className="text-red-400">
-          {!!products &&
-            products.map((product) => <p key={product.id}>{product.name}</p>)}
+        <div className="flex flex-row gap-4">
+          <Button>Сохранить</Button>
+          <Button variant={"destructive"}>Отмена</Button>
         </div>
+        <Dialog>
+          <DialogTrigger>
+            <MessageSquareCheck
+              className="text-red-500 size-9 bg-green-400 p-2 rounded-full"
+              strokeWidth={1.5}
+            />
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Dialog title</DialogTitle>
+            </DialogHeader>
+            <p>
+              Start by selecting your framework of choice. Then follow the
+              instructions to install the dependencies and structure your app.
+              shadcn/ui is built to work with all React frameworks.
+            </p>
+            <DialogFooter>
+              <DialogClose>
+                <Button variant={"destructive"}>Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
