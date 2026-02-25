@@ -1,6 +1,7 @@
 "use client";
 
 import { api } from "@/app/lib/client/api";
+import { queryClient } from "@/app/lib/client/query-client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -8,9 +9,12 @@ import { Category } from "@/lib/shared/types/category";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Pen } from "lucide-react";
+import { useState } from "react";
 import { z } from "zod/v4";
 
 export function CreateUpdateCategory({ category }: { category?: Category }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const categoySchema = z.object({
     name: z
       .string({ message: "Необходимо ввести имя" })
@@ -24,6 +28,14 @@ export function CreateUpdateCategory({ category }: { category?: Category }) {
     },
     onSuccess: () => {
       alert("Создана категория");
+      queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+      form.reset();
+      setIsOpen(false);
+    },
+    onError: () => {
+      alert("Ошибка создания категории");
     },
   });
 
@@ -34,6 +46,14 @@ export function CreateUpdateCategory({ category }: { category?: Category }) {
     },
     onSuccess: () => {
       alert("Обновлена категория");
+      queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+      form.reset();
+      setIsOpen(false);
+    },
+    onError: () => {
+      alert("Ошибка обновления категории");
     },
   });
 
@@ -54,7 +74,7 @@ export function CreateUpdateCategory({ category }: { category?: Category }) {
   });
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         {category ? <Pen /> : <Button>Создать</Button>}
       </DialogTrigger>
