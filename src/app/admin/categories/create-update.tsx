@@ -10,6 +10,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Pen } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod/v4";
 
 export function CreateUpdateCategory({ category }: { category?: Category }) {
@@ -27,7 +28,7 @@ export function CreateUpdateCategory({ category }: { category?: Category }) {
       await api.categories.post(data);
     },
     onSuccess: () => {
-      alert("Создана категория");
+      toast.success("Создана категория");
       queryClient.invalidateQueries({
         queryKey: ["categories"],
       });
@@ -45,7 +46,7 @@ export function CreateUpdateCategory({ category }: { category?: Category }) {
       await api.categories({ id: category!.id }).put(data);
     },
     onSuccess: () => {
-      alert("Обновлена категория");
+      toast.success("Обновлена категория");
       queryClient.invalidateQueries({
         queryKey: ["categories"],
       });

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMutation } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function DeleteCategory({ id }: { id: string }) {
   const deleteMutation = useMutation({
@@ -20,7 +21,7 @@ export function DeleteCategory({ id }: { id: string }) {
       await api.categories({ id }).delete();
     },
     onSuccess: () => {
-      alert("Категория удалена");
+      toast.success("Категория удалена");
       queryClient.invalidateQueries({
         queryKey: ["categories"],
       });

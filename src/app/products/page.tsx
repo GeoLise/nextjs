@@ -3,12 +3,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../lib/client/api";
 import { queryClient } from "../lib/client/query-client";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Orbit } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Products() {
   const [isActive, setIsActive] = useState(false);
@@ -46,7 +46,7 @@ export default function Products() {
               <p key={products.id}>{products.name}</p>
             ))}
         <Button
-          onClick={refetchProducts}
+          onClick={() => toast.success("Уведомление")}
           className="text-blue-500 bg-green-300 p-2 cursor-pointer"
         >
           Refetch products
