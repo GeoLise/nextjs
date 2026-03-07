@@ -6,6 +6,7 @@ import { Product } from "@/lib/shared/types/product";
 import { useQuery } from "@tanstack/react-query";
 import { ColumnDef } from "@tanstack/react-table";
 import { CreateUpdateProduct } from "./create-update";
+import { DeleteProduct } from "./delete";
 
 const columns: ColumnDef<Product>[] = [
   {
@@ -19,7 +20,12 @@ const columns: ColumnDef<Product>[] = [
   {
     id: "actions",
     header: () => <CreateUpdateProduct />,
-    cell: ({ row }) => <CreateUpdateProduct product={row.original} />,
+    cell: ({ row }) => (
+      <div className="flex flex-row items-center gap-4">
+        <CreateUpdateProduct product={row.original} />
+        <DeleteProduct id={row.original.id} />
+      </div>
+    ),
   },
 ];
 

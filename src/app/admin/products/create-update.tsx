@@ -1,6 +1,8 @@
 "use client";
 
 import { api } from "@/app/lib/client/api";
+import { queryClient } from "@/app/lib/client/query-client";
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ImageInput } from "@/components/ui/image-input";
 import { Input } from "@/components/ui/input";
@@ -8,14 +10,14 @@ import { Product } from "@/lib/shared/types/product";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Pen } from "lucide-react";
+import { toast } from "sonner";
 import z from "zod/v4";
 
 export function CreateUpdateProduct({ product }: { product?: Product }) {
   const schema = z.object({
     name: z.string().min(3),
     price: z.number().min(0),
-    description: z.string(),
-    image: z.string(),
+    image: z.string().nullable(),
     categoryId: z.string(),
   });
 
@@ -42,12 +44,26 @@ export function CreateUpdateProduct({ product }: { product?: Product }) {
     mutationFn: async (data: z.infer<typeof schema>) => {
       await api.products.post(data);
     },
+    onSuccess: () => {
+      toast.success("Продукт создан");
+      queryClient.invalidateQueries({
+        queryKey: ["products"],
+      });
+      form.reset();
+    },
   });
 
   const updateMutation = useMutation({
     mutationKey: ["updateProduct"],
     mutationFn: async (data: z.infer<typeof schema>) => {
       await api.products({ id: product!.id }).put(data);
+    },
+    onSuccess: () => {
+      toast.success("Продукт создан");
+      queryClient.invalidateQueries({
+        queryKey: ["products"],
+      });
+      form.reset();
     },
   });
 
@@ -122,6 +138,16 @@ export function CreateUpdateProduct({ product }: { product?: Product }) {
               </div>
             )}
           </form.Field>
+          <form.Subscribe>
+            {(formState) => (
+              <Button
+                type="submit"
+                onClick={() => console.log(formState.values)}
+              >
+                {formState.isSubmitting ? "Сохранение..." : "Сохранить"}
+              </Button>
+            )}
+          </form.Subscribe>
         </form>
       </DialogContent>
     </Dialog>

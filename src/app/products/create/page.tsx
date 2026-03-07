@@ -6,7 +6,6 @@ import { api } from "@/app/lib/client/api";
 import { queryClient } from "@/app/lib/client/query-client";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import Image from "next/image";
 import z from "zod/v4";
 
 export default function CreateProductPage() {
@@ -17,7 +16,7 @@ export default function CreateProductPage() {
       .max(30),
     price: z.number({ message: "Price is required" }).min(1).max(100000000),
     categoryId: z.string(),
-    image: z.string().optional(),
+    image: z.string().nullable(),
   });
 
   const { data: categories } = useQuery({

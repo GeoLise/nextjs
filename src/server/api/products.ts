@@ -5,60 +5,76 @@ import { products } from "../db/products";
 import z from "zod/v4";
 import { userService } from "./user";
 
-
-
 export const productsRouter = new Elysia({
-    prefix: "/products"
+  prefix: "/products",
 })
-.use(userService)
-.get("/", async () => {
+  .use(userService)
+  .get("/", async () => {
     return await db.query.products.findMany({
-        where: eq(products.isDeleted, false)
-    })
-})
-.get("/:id", async ({ params }) => {
+      where: eq(products.isDeleted, false),
+    });
+  })
+  .get("/:id", async ({ params }) => {
     return await db.query.products.findFirst({
-        where: eq(products.id, params.id)
-    })
-})
-.post("/", async ({ body }) => {
-    return await db.insert(products).values({
-        name: body.name,
-        price: body.price,
-        categoryId: body.categoryId,
-        image: body.image
-    }).returning()
-}, {
-    body: z.object({
+      where: eq(products.id, params.id),
+    });
+  })
+  .post(
+    "/",
+    async ({ body }) => {
+      return await db
+        .insert(products)
+        .values({
+          name: body.name,
+          price: body.price,
+          categoryId: body.categoryId,
+          image: body.image,
+        })
+        .returning();
+    },
+    {
+      body: z.object({
         name: z.string(),
         price: z.number(),
         categoryId: z.string(),
-        image: z.string().optional(),
-    }),
-    // hasRole: "ADMIN"
-})
-.put("/:id", async ({ params, body}) => {
-    await db.update(products).set({
-        name: body.name,
-        price: body.price,
-        categoryId: body.categoryId
-    })
-    .where(eq(products.id, params.id))
-}, {
-    body: z.object({
+        image: z.string().nullable(),
+      }),
+      // hasRole: "ADMIN"
+    },
+  )
+  .put(
+    "/:id",
+    async ({ params, body }) => {
+      await db
+        .update(products)
+        .set({
+          name: body.name,
+          price: body.price,
+          categoryId: body.categoryId,
+        })
+        .where(eq(products.id, params.id));
+    },
+    {
+      body: z.object({
         name: z.string(),
         price: z.number(),
-        categoryId: z.string()
-    })
-})
-.delete("/:id", async ({ params }) => {
-    await db.update(products).set({
-        isDeleted: true
-    })
-    .where(eq(products.id, params.id))
-})
-.get("/byCategory/:id", async ({ params }) => {
+        categoryId: z.string(),
+      }),
+    },
+  )
+  .delete("/:id", async ({ params }) => {
+    await db
+      .update(products)
+      .set({
+        isDeleted: true,
+      })
+      .where(eq(products.id, params.id));
+  })
+  .get("/byCategory/:id", async ({ params }) => {
     return await db.query.products.findMany({
-        where: and(eq(products.categoryId, params.id), eq(products.isDeleted, false))
-    })
-})
+      where: and(
+        eq(products.categoryId, params.id),
+        eq(products.isDeleted, false),
+      ),
+    });
+  });

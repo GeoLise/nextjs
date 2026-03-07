@@ -8,10 +8,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { api } from "@/server/api";
 import { MessageSquareCheck } from "lucide-react";
 import Image from "next/image";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
+  const products = (await api.products.get()).data;
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-800 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-zinc-400 dark:bg-black sm:items-start">
@@ -98,6 +103,11 @@ export default async function Home() {
           </DialogContent>
         </Dialog>
       </main>
+      <div>
+        {products?.map((prod) => (
+          <p key={prod.id}>{prod.name}</p>
+        ))}
+      </div>
     </div>
   );
 }
